@@ -4,7 +4,9 @@ An anti-idiom error handling for Go 1 : just panic!
 
 ## usage
 
-```go get github.com/JackKCWong/panicea```
+```
+go get github.com/JackKCWong/panicea
+```
 
 ```go
 import (
