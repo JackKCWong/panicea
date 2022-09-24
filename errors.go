@@ -31,6 +31,27 @@ func Trap[T any](fn func() T) (val T, reErr error) {
 	return fn(), nil
 }
 
+type Result[T any] struct {
+	Val T	
+	Err error
+}
+
+func Pack[T any] (val T, err error) Result[T] {
+	return Result[T]{
+		Val: val,
+		Err: err,
+	}
+}
+
+func Wrap[T any](fn func() T) (Result[T]) {
+	var r Result[T]
+	defer catch(&r.Err, nil)
+
+	r.Val = fn()
+
+	return r
+}
+
 func catch(cause *error, handler func(error)) {
 	if caught := recover(); caught != nil {
 		if err, ok := caught.(error); ok {
