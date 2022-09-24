@@ -19,19 +19,19 @@ func Check(err error) {
 }
 
 func Try(fn func()) (reErr error) {
-	defer Catch(&reErr, nil)
+	defer catch(&reErr, nil)
 	fn()
 
 	return nil
 }
 
 func Trap[T any](fn func() T) (val T, reErr error) {
-	defer Catch(&reErr, nil)
+	defer catch(&reErr, nil)
 
 	return fn(), nil
 }
 
-func Catch(cause *error, handler func(error)) {
+func catch(cause *error, handler func(error)) {
 	if caught := recover(); caught != nil {
 		if err, ok := caught.(error); ok {
 			*cause = err

@@ -8,7 +8,7 @@ import (
 func TestCheck(t *testing.T) {
 	errorCaught := false
 	err := func() (err error) {
-		defer Catch(&err, func(err error) {
+		defer catch(&err, func(err error) {
 			errorCaught = true
 		})
 
