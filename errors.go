@@ -1,8 +1,6 @@
 package panicea
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 )
 
@@ -60,7 +58,8 @@ func catch(cause *error, handler func(error)) {
 				handler(err)
 			}
 		} else {
-			panic(fmt.Errorf("expecting a error type but was: %q", caught))
+			// propagate the original panic up
+			panic(caught)
 		}
 	}
 }
