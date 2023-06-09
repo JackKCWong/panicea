@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-    err := Try(func() {
+    err := Trap(func() {
         panic(fmt.Errorf("just panic with an error"))
     })
 
@@ -23,11 +23,10 @@ func main() {
     }
 
     // or if you need return value
-    r, err := Trap(func() int {
-        Check(somethingMayErr())            // panic if err
-        r = Must(somethingMayReturnIntOrErr()) // panic if err
+    v, err := Try(func() int {
+        v := Catch(somethingMayReturnIntOrErr()).On("error: %w")     // panic if err
 
-        return r
+        return v
     })
 
     if err != nil {

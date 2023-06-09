@@ -12,9 +12,7 @@ func TestCheck(t *testing.T) {
 			errorCaught = true
 		})
 
-		Check(fmt.Errorf("I am an error"))
-
-		return nil
+		panic(fmt.Errorf("I am an error"))
 	}()
 
 	if err.Error() != "I am an error" {
@@ -28,8 +26,8 @@ func TestCheck(t *testing.T) {
 	t.Logf("%+v", err)
 }
 
-func TestTrap(t *testing.T) {
-	n, err := Trap(func() int {
+func TestTry(t *testing.T) {
+	n, err := Try(func() int {
 		return 10
 	})
 
@@ -41,10 +39,8 @@ func TestTrap(t *testing.T) {
 		t.Fatalf("unexpected result: %q", n)
 	}
 
-	n, err = Trap(func() int {
-		Check(fmt.Errorf("I am an error"))
-
-		return -1
+	n, err = Try(func() int {
+		panic(fmt.Errorf("I am an error"))
 	})
 
 	if err == nil || err.Error() != "I am an error" {
@@ -56,4 +52,29 @@ func TestTrap(t *testing.T) {
 	}
 
 	t.Logf("%+v", err)
+}
+
+
+func TestCatch(t *testing.T) {
+	f1 := func() (int, error) {
+		return 10, nil
+	}	
+
+	v := Catch(f1()).On("failure!")
+
+	if v != 10 {
+		t.Fatalf("expected val: %v", v)
+	}
+
+	f2 := func() (int, error) {
+		return 0, fmt.Errorf("random error") 
+	}	
+
+	err := Trap(func() {
+		Catch(f2()).On("failure: %w")
+	})
+
+	if err.Error() != "failure: random error" {
+		t.Fatalf("unexpected err: %v", err)
+	}
 }

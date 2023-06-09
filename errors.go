@@ -1,53 +1,19 @@
 package panicea
 
-import (
-	"github.com/pkg/errors"
-)
+import "fmt"
 
-func Must[T any](val T, err error) T {
-	Check(err)
 
-	return val
-}
-
-func Check(err error) {
-	if err != nil {
-		panic(errors.WithStack(err))
-	}
-}
-
-func Try(fn func()) (reErr error) {
+func Trap(fn func()) (reErr error) {
 	defer catch(&reErr, nil)
 	fn()
 
 	return nil
 }
 
-func Trap[T any](fn func() T) (val T, reErr error) {
+func Try[T any](fn func() T) (val T, reErr error) {
 	defer catch(&reErr, nil)
 
 	return fn(), nil
-}
-
-type Result[T any] struct {
-	Val T	
-	Err error
-}
-
-func Pack[T any] (val T, err error) Result[T] {
-	return Result[T]{
-		Val: val,
-		Err: err,
-	}
-}
-
-func Wrap[T any](fn func() T) (Result[T]) {
-	var r Result[T]
-	defer catch(&r.Err, nil)
-
-	r.Val = fn()
-
-	return r
 }
 
 func catch(cause *error, handler func(error)) {
@@ -61,5 +27,25 @@ func catch(cause *error, handler func(error)) {
 			// propagate the original panic up
 			panic(caught)
 		}
+	}
+}
+
+type Result[T any] struct {
+	err error
+	val T
+}
+
+
+func (r *Result[T]) On(msg string) T {
+	if r.err != nil {
+		panic(fmt.Errorf(msg, r.err))
+	}
+
+	return r.val
+}
+
+func Catch[T any](val T, err error) *Result[T] {
+	return &Result[T]{
+		err, val,
 	}
 }
